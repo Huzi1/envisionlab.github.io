@@ -15,14 +15,14 @@ const Dashboard = () => {
     const [entryData, setEntryData] = useState([]);
     const [count, setCount] = useState({ start: 0, end: 500 })
 
-    // const { REACT_APP_GET_API } = process.env;
-    useEffect(() => {
 
+    useEffect(() => {
+        
         axios.post("http://localhost:5000/getData", { start: count.start, end: count.end }).then(
             response => {
                 setData(response.data);
                 setActive(true);
-                
+
             });
 
     }, []);
@@ -44,7 +44,7 @@ const Dashboard = () => {
             handleExitDataCLick();
         }
 
-     
+
     }
 
 
@@ -66,7 +66,7 @@ const Dashboard = () => {
 
 
 
-      
+
     }
     const handleAllDataClick = () => {
         axios.post("http://localhost:5000/getData", { start: count.start, end: count.end }).then(
@@ -98,7 +98,7 @@ const Dashboard = () => {
             {active === false ? <Spinner animation="grow" /> : <div>
                 <div>
 
-                    <h1>React app</h1>
+                    <h1>Data Visiualisation on ApexCharts JS</h1>
                     {/* {data.length < 0 && <Spinner animation="grow" />} */}
 
                     {(() => {
