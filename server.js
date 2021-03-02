@@ -1,6 +1,5 @@
 
 import express from 'express';
-
 import database from './backend/config/db.js';
 import dotenv from 'dotenv';
 import cors from "cors";
@@ -16,37 +15,111 @@ app.listen(PORT, console.log(`App is running in ${process.env.NODE_ENV} mode on 
 database.mongoConnect()
 
 
-app.get('/getEntryData', function (req, res) {
-    // getting all the data
-    // console.log("HIT Entry")
+app.post('/getEntryData', function (req, res) {
+
+    const count = req.body
     let db = database.getDb();
-    db.collection('sample-data')
-        .find({ "direction": "entry" }).limit(8000)
-        .toArray(function (err, items) {
-            res.send(items)
-        })
+    db.collection('sample-data').aggregate([
+        {
+            $match: {
+                "direction": "entry"
+            }
+        },
+        {
+            $group: {
+                _id: "$timestamp",
+                count: {
+                    $sum: 1
+                },
+            }
+        },
+        {
+            $addFields: {
+                y: "$count",
+                x: "$_id",
+            }
+        },
+        {
+            "$project": {
+                "_id": 0,
+                "count": 0,
+
+            }
+        }
+    ]).skip(count.start).limit(count.end).toArray(function (err, items) {
+
+        res.send(items)
+    })
 });
 
-app.get('/getData', function (req, res) {
+
+
+app.post('/getData', function (req, res) {
     // getting all the data
+    const count = req.body
+
     let db = database.getDb();
-    db.collection('sample-data')
-        .find().limit(8000)
-        .toArray(function (err, items) {
-            res.send(items)
-        })
+
+
+    db.collection('sample-data').aggregate([
+        {
+            $group: {
+                _id: "$timestamp",
+                count: {
+                    $sum: 1
+                },
+            }
+        },
+        {
+            $addFields: {
+                y: "$count",
+                x: "$_id",
+            }
+        },
+        {
+            "$project": {
+                "_id": 0,
+                "count": 0,
+
+            }
+        }
+    ]).skip(count.start).limit(500).toArray(function (err, items) {
+        res.send(items)
+
+    })
 });
 
-app.get('/getExitData', function (req, res) {
-    // getting all the data
-    // console.log("HIT EXIT")
-    let db = database.getDb();
-    db.collection('sample-data')
-        .find({ "direction": "exit" }).limit(8000)
-        .toArray(function (err, items) {
-            res.send(items)
+app.post('/getExitData', function (req, res) {
 
-        })
+    const count = req.body
+    let db = database.getDb();
+    db.collection('sample-data').aggregate([
+        { $match: { "direction": "exit" } },
+        {
+            $group: {
+                _id: "$timestamp",
+                count: {
+                    $sum: 1
+                },
+            }
+        },
+        {
+            $addFields: {
+                y: "$count",
+                x: "$_id",
+            }
+        },
+        {
+            "$project": {
+                "_id": 0,
+                "count": 0,
+
+            }
+        }
+    ]).skip(count.start).limit(500).toArray(function (err, items) {
+        res.send(items)
+
+    })
 });
 
 // Graceful db disconnection

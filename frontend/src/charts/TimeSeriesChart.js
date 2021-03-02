@@ -1,37 +1,51 @@
-import React, { useEffect, useState } from "react";
-import {
-    Charts,
-    ChartContainer,
-    ChartRow,
-    YAxis,
-    LineChart
-} from "react-timeseries-charts";
+constructor(props) {
+    super(props);
 
-const TimeSeriesChart = (props) => {
-    const { timeData } = props;
-    // min "timestamp": "2021-02-24T10:03:47.000Z",
-    // max "timestamp": "2021-02-23T10:45:19.587Z",
-    const labels = Object.keys(timeData).reverse();
-    const minTimeZone = labels[0]
-    const maxTimeZone = labels[labels.length - 1]
-    const values = Object.values(timeData).reverse();
+    this.state = {
+    
+      series: [{
+          name: "Desktops",
+          data: [10, 41, 35, 51, 49, 62, 69, 91, 148]
+      }],
+      options: {
+        chart: {
+          height: 350,
+          type: 'line',
+          zoom: {
+            enabled: false
+          }
+        },
+        dataLabels: {
+          enabled: false
+        },
+        stroke: {
+          curve: 'straight'
+        },
+        title: {
+          text: 'Product Trends by Month',
+          align: 'left'
+        },
+        grid: {
+          row: {
+            colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+            opacity: 0.5
+          },
+        },
+        xaxis: {
+          categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'],
+        }
+      },
+    
+    
+    };
+  }
+
+
+
+  render() {
     return (
-        <>
-            <ChartContainer timeRange={this.state.timerange} >
-                <ChartRow height="200">
-                    <YAxis id="y" label="Price ($)" min={0.5} max={1.5} format="$,.2f" />
-                    <Charts>
-                        <LineChart
-                            axis="y"
-                            breakLine={false}
-                            series={currencySeries}
-                            columns={["aud", "euro"]}
-                            style={style}
-                            interpolation="curveBasis" />
-                    </Charts>
-                </ChartRow>
-            </ChartContainer>
-        </>
-    )
-}
-export default TimeSeriesChart;
+      
+
+<div id="chart">
+<ReactApexChart options={this.state.options} series={this.state.series} type="line" height={350} />
+</div>

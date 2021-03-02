@@ -1,30 +1,75 @@
 import React, { useEffect, useState } from "react";
 import { getCountBy } from '../util/util';
-import LinePlot from './Line';
+
+import ApexLineChart from './ApexLineChart';
 import axios from "axios";
 import Button from 'react-bootstrap/Button';
+import { STATES } from "mongoose";
+import Spinner from 'react-bootstrap/Spinner'
 
 const Dashboard = () => {
     const [status, setStatus] = useState("RAW")
     const [data, setData] = useState([]);
+    const [active, setActive] = useState(false);
     const [exitData, setExitData] = useState([]);
     const [entryData, setEntryData] = useState([]);
-
+    const [count, setCount] = useState({ start: 0, end: 500 })
 
     // const { REACT_APP_GET_API } = process.env;
-    useEffect((mode) => {
+    useEffect(() => {
 
-        axios.get("http://localhost:5000/getData").then(
+        axios.post("http://localhost:5000/getData", { start: count.start, end: count.end }).then(
             response => {
-                setData(response.data)
-
+                setData(response.data);
+                setActive(true);
+                
             });
 
     }, []);
 
+    const handlePrevButtonCLick = () => {
 
+        if (count.start > 0) {
+            setCount({ start: count.start - 500, end: count.end - 500 })
+        }
+        if (status === "RAW") {
+            handleAllDataClick();
+        }
+        if (status === "ENTRY") {
+
+            handleEntryDataClick();
+        }
+        if (status === "EXIT") {
+
+            handleExitDataCLick();
+        }
+
+     
+    }
+
+
+    const handleNextButtonCLick = () => {
+
+        setCount({ start: count.start + 500, end: count.end + 500 })
+
+        if (status === "RAW") {
+            handleAllDataClick();
+        }
+        if (status === "ENTRY") {
+
+            handleEntryDataClick();
+        }
+        if (status === "EXIT") {
+
+            handleExitDataCLick();
+        }
+
+
+
+      
+    }
     const handleAllDataClick = () => {
-        axios.get("http://localhost:5000/getData").then(
+        axios.post("http://localhost:5000/getData", { start: count.start, end: count.end }).then(
             response => {
                 setData(response.data)
 
@@ -32,7 +77,7 @@ const Dashboard = () => {
         setStatus("RAW");
     }
     const handleEntryDataClick = () => {
-        axios.get("http://localhost:5000/getEntryData").then(
+        axios.post("http://localhost:5000/getEntryData", { start: count.start, end: count.end }).then(
             response => {
                 setEntryData(response.data)
                 // setRawData(response.data);
@@ -40,45 +85,53 @@ const Dashboard = () => {
         setStatus("ENTRY");
     }
     const handleExitDataCLick = () => {
-        axios.get("http://localhost:5000/getExitData").then(
+        axios.post("http://localhost:5000/getExitData", { start: count.start, end: count.end }).then(
             response => {
                 setExitData(response.data)
                 // setRawData(response.data);
             });
         setStatus("EXIT");
     }
+
     return (
         <>
-            <div>
+            {active === false ? <Spinner animation="grow" /> : <div>
+                <div>
 
-                <h1>React app</h1>
+                    <h1>React app</h1>
+                    {/* {data.length < 0 && <Spinner animation="grow" />} */}
 
-                {/* {data.length > 0 && <LinePlot seriesData={data} />} */}
-
-                {(() => {
-                    switch (status) {
-                        case "EXIT":
-                            return exitData.length > 0 && <LinePlot timeData={getCountBy(exitData)} label={"Exit"} />;
-                        case "ENTRY":
-                            return entryData.length > 0 && <LinePlot timeData={getCountBy(entryData)} label={"Entry"} />;
-                        default:
-                            return data.length > 0 && <LinePlot timeData={getCountBy(data)} label={""} />;
+                    {(() => {
+                        if (count) {
+                            switch (status) {
+                                case "EXIT":
+                                    return exitData.length > 0 && <ApexLineChart timeData={exitData} label={status} paginationStart={count.start} paginationStop={count.end} />;
+                                case "ENTRY":
+                                    return entryData.length > 0 && <ApexLineChart timeData={entryData} label={status} paginationStart={count.start} paginationStop={count.end} />;
+                                default:
+                                    return data.length > 0 && <ApexLineChart timeData={data} label={""} paginationStart={count.start} paginationStop={count.end} />;
+                            }
+                        }
                     }
-                }
-                )()}
-            </div>
-            <div>
-                <Button variant="primary" size="lg" active onClick={handleAllDataClick} style={{ padding: "10px", margin: "10px" }}>
-                    All Data
+                    )()}
+                </div>
+                <div>
+                    <Button variant="secondary" onClick={handlePrevButtonCLick} id="start">Previous</Button> <label id="mylabel"> Data from {count.start} to {count.end}</label> <Button variant="secondary" id="end" onClick={handleNextButtonCLick}>Next</Button>
+                </div>
+
+                <div>
+                    <Button variant="primary" size="lg" active onClick={handleAllDataClick} style={{ padding: "10px", margin: "10px" }}>
+                        All Data
                 </Button>
 
-                <Button variant="primary" size="lg" active onClick={handleEntryDataClick} style={{ padding: "10px", margin: "10px" }}>
-                    Entry Data
+                    <Button variant="primary" size="lg" active onClick={handleEntryDataClick} style={{ padding: "10px", margin: "10px" }}>
+                        Entry Data
                 </Button>
-                <Button variant="primary" size="lg" active onClick={handleExitDataCLick} style={{ padding: "10px", margin: "10px" }}>
-                    Exit Data
+                    <Button variant="primary" size="lg" active onClick={handleExitDataCLick} style={{ padding: "10px", margin: "10px" }}>
+                        Exit Data
                 </Button>
-            </div>
+                </div>
+            </div>}
         </>
     )
 }
