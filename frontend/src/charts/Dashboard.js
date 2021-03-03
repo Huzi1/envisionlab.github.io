@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { getCountBy } from '../util/util';
-
 import ApexLineChart from './ApexLineChart';
 import axios from "axios";
 import Button from 'react-bootstrap/Button';
-import { STATES } from "mongoose";
 import Spinner from 'react-bootstrap/Spinner'
 
 const Dashboard = () => {
