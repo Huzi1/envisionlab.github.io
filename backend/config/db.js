@@ -46,7 +46,7 @@ let _db, _client;
 
 
 
-export async function getEntryData(count) {
+export async function getEntryData(count, flag = false, dateTimeStart, dateTimeEnd) {
 
     const client = new MongoClient(CONNECTION_STRING);
 
@@ -54,32 +54,71 @@ export async function getEntryData(count) {
         // Connect to the MongoDB cluster
         await client.connect();
         // execute query
-        const response = await client.db(dbName).collection('sample-data').aggregate([
-            { $match: { "direction": "entry" } },
-            {
-                $group: {
-                    _id: "$timestamp",
-                    count: {
-                        $sum: 1
-                    },
-                }
-            },
-            {
-                $addFields: {
-                    y: "$count",
-                    x: "$_id",
-                }
-            },
-            {
-                "$project": {
-                    "_id": 0,
-                    "count": 0,
+        if (flag === 'true') {
+            const response = await client.db(dbName).collection('sample-data').aggregate([
+                { $match: { "direction": "entry" } },
+                {
+                    $group: {
+                        _id: "$timestamp",
+                        count: {
+                            $sum: 1
+                        },
+                    }
+                }, {
+                    $match: {
+                        _id: {
+                            $gte: dateTimeStart,
+                            $lte: dateTimeEnd,
 
-                }
-            }
-        ]).skip(count).limit(200).toArray();
+                        }
+                    }
+                },
+                {
+                    $addFields: {
+                        y: "$count",
+                        x: "$_id",
+                    }
+                },
+                {
+                    "$project": {
+                        "_id": 0,
+                        "count": 0,
 
-        return response;
+                    }
+                }
+            ]).skip(count).limit(200).toArray();
+
+            return response;
+        }
+        else {
+            const response = await client.db(dbName).collection('sample-data').aggregate([
+                { $match: { "direction": "entry" } },
+                {
+                    $group: {
+                        _id: "$timestamp",
+                        count: {
+                            $sum: 1
+                        },
+                    }
+                },
+                {
+                    $addFields: {
+                        y: "$count",
+                        x: "$_id",
+                    }
+                },
+                {
+                    "$project": {
+                        "_id": 0,
+                        "count": 0,
+
+                    }
+                }
+            ]).skip(count).limit(200).toArray();
+
+            return response;
+        }
+
         // Make the appropriate DB calls
         // await listDatabases(client);
     } catch (e) {
@@ -90,7 +129,7 @@ export async function getEntryData(count) {
 
 
 }
-export async function getExitData(count) {
+export async function getExitData(count, flag = false, dateTimeStart, dateTimeEnd) {
 
     const client = new MongoClient(CONNECTION_STRING);
 
@@ -98,32 +137,71 @@ export async function getExitData(count) {
         // Connect to the MongoDB cluster
         await client.connect();
         // execute query
-        const response = await client.db(dbName).collection('sample-data').aggregate([
-            { $match: { "direction": "exit" } },
-            {
-                $group: {
-                    _id: "$timestamp",
-                    count: {
-                        $sum: 1
-                    },
-                }
-            },
-            {
-                $addFields: {
-                    y: "$count",
-                    x: "$_id",
-                }
-            },
-            {
-                "$project": {
-                    "_id": 0,
-                    "count": 0,
+        if (flag === 'true') {
+            const response = await client.db(dbName).collection('sample-data').aggregate([
+                { $match: { "direction": "exit" } },
+                {
+                    $group: {
+                        _id: "$timestamp",
+                        count: {
+                            $sum: 1
+                        },
+                    }
+                }, {
+                    $match: {
+                        _id: {
+                            $gte: dateTimeStart,
+                            $lte: dateTimeEnd,
 
-                }
-            }
-        ]).skip(count).limit(200).toArray();
+                        }
+                    }
+                },
+                {
+                    $addFields: {
+                        y: "$count",
+                        x: "$_id",
+                    }
+                },
+                {
+                    "$project": {
+                        "_id": 0,
+                        "count": 0,
 
-        return response;
+                    }
+                }
+            ]).skip(count).limit(200).toArray();
+
+            return response;
+        }
+        else {
+            const response = await client.db(dbName).collection('sample-data').aggregate([
+                { $match: { "direction": "exit" } },
+                {
+                    $group: {
+                        _id: "$timestamp",
+                        count: {
+                            $sum: 1
+                        },
+                    }
+                },
+                {
+                    $addFields: {
+                        y: "$count",
+                        x: "$_id",
+                    }
+                },
+                {
+                    "$project": {
+                        "_id": 0,
+                        "count": 0,
+
+                    }
+                }
+            ]).skip(count).limit(200).toArray();
+
+            return response;
+        }
+
     } catch (e) {
         console.error(e);
     } finally {
@@ -178,7 +256,7 @@ export async function getAllData(count, flag = false, dateTimeStart, dateTimeEnd
 
             return response;
         }
-        console.log("In getAllData false flag")
+
         const response = await client.db(dbName).collection('sample-data').aggregate([
             {
                 $group: {

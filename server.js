@@ -20,10 +20,21 @@ var dateTimeEnd;
 app.get('/getEntryData', async function (req, res) {
 
     const count = parseInt(req.query.start);
+    const flag = (req.query.flag);
+    if (flag === 'true') {
+        dateTimeStart = req.query.dateTimeStart;
+        dateTimeEnd = req.query.dateTimeEnd;
 
-    let queryResp = await getEntryData(count);
+        let queryResp = await getEntryData(count, flag, dateTimeStart, dateTimeEnd);
 
-    res.send(queryResp).status(200)
+        res.send(queryResp).status(200)
+    } else {
+        let queryResp = await getEntryData(count, dateTimeStart, dateTimeEnd);
+
+        res.send(queryResp).status(200)
+
+    }
+
 
 });
 
@@ -59,10 +70,20 @@ app.get('/getAllData', async function (req, res) {
 app.get('/getExitData', async function (req, res) {
 
     const count = parseInt(req.query.start);
+    const flag = (req.query.flag);
+    if (flag === 'true') {
+        dateTimeStart = req.query.dateTimeStart;
+        dateTimeEnd = req.query.dateTimeEnd;
 
-    let queryResp = await getExitData(count);
+        let queryResp = await getExitData(count, flag, dateTimeStart, dateTimeEnd);
 
-    res.send(queryResp).status(200)
+        res.send(queryResp).status(200)
+    }
+    else {
+        let queryResp = await getExitData(count, dateTimeStart, dateTimeEnd);
+
+        res.send(queryResp).status(200)
+    }
 
 });;
 

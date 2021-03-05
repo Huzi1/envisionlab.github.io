@@ -15,23 +15,30 @@ const Dashboard = () => {
     const [count, setCount] = useState({ start: 0, end: 200 })
     const [dateFilter, setDateFilter] = useState(false)
     const [dates, setDates] = useState({ start: '', end: '', show: false })
-
+    const [render, setRender] = useState(false)
 
     useEffect(() => {
+        console.log("useEffect Running")
+        if (render === false) {
+            axios.get("http://localhost:5000/getAllData", { params: { start: count.start, end: count.end, flag: dateFilter, dateTimeStart: dates.start, dateTimeEnd: dates.end } }).then(
+                response => {
+                    setData(response.data);
+                    setActive(true);
+                    // if (dateFilter === true) {
+                    // setDateFilter(false);
+                    // }
+                    setRender(true)
+                }).catch(e => { console.log(e) });
+        }
 
-        axios.get("http://localhost:5000/getAllData", { params: { start: count.start, end: count.end, flag: dateFilter, dateTimeStart: dates.start, dateTimeEnd: dates.end } }).then(
-            response => {
-                setData(response.data);
-                setActive(true);
-                setDateFilter(false);
-            }).catch(e => { console.log(e) });
 
-    }, [status, count, dateFilter]);
+    }, [count, render, status]);
     const handleDatesChange = (values) => {
         setDates({ start: values.start, end: values.end, show: true })
     }
     const handleDateFilter = () => {
         setDateFilter(true);
+        setRender(false);
     }
     const handlePrevButtonCLick = () => {
 
@@ -75,7 +82,7 @@ const Dashboard = () => {
 
     }
     const handleAllDataClick = () => {
-        axios.get("http://localhost:5000/getAllData", { params: { start: count.start, end: count.end } }).then(
+        axios.get("http://localhost:5000/getAllData", { params: { start: count.start, end: count.end, flag: dateFilter, dateTimeStart: dates.start, dateTimeEnd: dates.end } }).then(
             response => {
                 setData(response.data)
 
@@ -83,7 +90,7 @@ const Dashboard = () => {
         setStatus("RAW");
     }
     const handleEntryDataClick = () => {
-        axios.get("http://localhost:5000/getEntryData", { params: { start: count.start, end: count.end } }).then(
+        axios.get("http://localhost:5000/getEntryData", { params: { start: count.start, end: count.end, flag: dateFilter, dateTimeStart: dates.start, dateTimeEnd: dates.end } }).then(
             response => {
                 setEntryData(response.data)
                 // setRawData(response.data);
@@ -91,7 +98,7 @@ const Dashboard = () => {
         setStatus("ENTRY");
     }
     const handleExitDataCLick = () => {
-        axios.get("http://localhost:5000/getExitData", { params: { start: count.start, end: count.end } }).then(
+        axios.get("http://localhost:5000/getExitData", { params: { start: count.start, end: count.end, flag: dateFilter, dateTimeStart: dates.start, dateTimeEnd: dates.end } }).then(
             response => {
                 setExitData(response.data)
                 // setRawData(response.data);
