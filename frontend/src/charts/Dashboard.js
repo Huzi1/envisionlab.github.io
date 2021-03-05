@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import ApexLineChart from './ApexLineChart';
 import axios from "axios";
-import Button from 'react-bootstrap/Button';
-import Spinner from 'react-bootstrap/Spinner'
+import { Button, Row, Col } from 'react-bootstrap';
+import Spinner from 'react-bootstrap/Spinner';
+import DatePicker from './DatePicker'
+
 
 const Dashboard = () => {
     const [status, setStatus] = useState("RAW")
@@ -10,24 +12,31 @@ const Dashboard = () => {
     const [active, setActive] = useState(false);
     const [exitData, setExitData] = useState([]);
     const [entryData, setEntryData] = useState([]);
-    const [count, setCount] = useState({ start: 0, end: 500 })
+    const [count, setCount] = useState({ start: 0, end: 200 })
+    const [dateFilter, setDateFilter] = useState(false)
+    const [dates, setDates] = useState({ start: '', end: '', show: false })
 
 
     useEffect(() => {
-        
-        axios.post("http://localhost:5000/getData", { start: count.start, end: count.end }).then(
+
+        axios.get("http://localhost:5000/getAllData", { params: { start: count.start, end: count.end, flag: dateFilter, dateTimeStart: dates.start, dateTimeEnd: dates.end } }).then(
             response => {
                 setData(response.data);
                 setActive(true);
+                setDateFilter(false);
+            }).catch(e => { console.log(e) });
 
-            });
-
-    }, []);
-
+    }, [status, count, dateFilter]);
+    const handleDatesChange = (values) => {
+        setDates({ start: values.start, end: values.end, show: true })
+    }
+    const handleDateFilter = () => {
+        setDateFilter(true);
+    }
     const handlePrevButtonCLick = () => {
 
         if (count.start > 0) {
-            setCount({ start: count.start - 500, end: count.end - 500 })
+            setCount({ start: count.start - 200, end: count.end - 200 })
         }
         if (status === "RAW") {
             handleAllDataClick();
@@ -47,7 +56,7 @@ const Dashboard = () => {
 
     const handleNextButtonCLick = () => {
 
-        setCount({ start: count.start + 500, end: count.end + 500 })
+        setCount({ start: count.start + 200, end: count.end + 200 })
 
         if (status === "RAW") {
             handleAllDataClick();
@@ -66,7 +75,7 @@ const Dashboard = () => {
 
     }
     const handleAllDataClick = () => {
-        axios.post("http://localhost:5000/getData", { start: count.start, end: count.end }).then(
+        axios.get("http://localhost:5000/getAllData", { params: { start: count.start, end: count.end } }).then(
             response => {
                 setData(response.data)
 
@@ -74,7 +83,7 @@ const Dashboard = () => {
         setStatus("RAW");
     }
     const handleEntryDataClick = () => {
-        axios.post("http://localhost:5000/getEntryData", { start: count.start, end: count.end }).then(
+        axios.get("http://localhost:5000/getEntryData", { params: { start: count.start, end: count.end } }).then(
             response => {
                 setEntryData(response.data)
                 // setRawData(response.data);
@@ -82,7 +91,7 @@ const Dashboard = () => {
         setStatus("ENTRY");
     }
     const handleExitDataCLick = () => {
-        axios.post("http://localhost:5000/getExitData", { start: count.start, end: count.end }).then(
+        axios.get("http://localhost:5000/getExitData", { params: { start: count.start, end: count.end } }).then(
             response => {
                 setExitData(response.data)
                 // setRawData(response.data);
@@ -128,8 +137,21 @@ const Dashboard = () => {
                         Exit Data
                 </Button>
                 </div>
+                <div>
+                    {dates.show === false
+                        ? <label>Set date time range for filter samples</label>
+
+                        : <Button variant="primary" size="lg" active onClick={handleDateFilter} style={{ padding: "10px", margin: "10px" }}>
+                            Set Date filter
+                         </Button>
+                    }
+
+                    <DatePicker handleDatesChange={handleDatesChange} />
+                </div>
             </div>}
+
         </>
     )
 }
 export default Dashboard;
+
