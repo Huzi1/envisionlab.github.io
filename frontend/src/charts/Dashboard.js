@@ -18,7 +18,7 @@ const Dashboard = () => {
     const [render, setRender] = useState(false)
 
     useEffect(() => {
-        console.log("useEffect Running")
+        // console.log("useEffect Running")
         if (render === false) {
             axios.get("http://localhost:5000/getAllData", { params: { start: count.start, end: count.end, flag: dateFilter, dateTimeStart: dates.start, dateTimeEnd: dates.end } }).then(
                 response => {

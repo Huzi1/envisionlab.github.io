@@ -44,7 +44,7 @@ app.get('/getEntryData', async function (req, res) {
 
 
 app.get('/getAllData', async function (req, res) {
-    console.log("req", req.query)
+    // console.log("req", req.query)
 
     const count = parseInt(req.query.start);
     const flag = (req.query.flag);

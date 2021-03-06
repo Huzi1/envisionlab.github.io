@@ -221,7 +221,7 @@ export async function getAllData(count, flag = false, dateTimeStart, dateTimeEnd
         // execute query
         // const response = await client.db(dbName).collection('sample-data').find().limit(500).toArray();
         if (flag === 'true') {
-            console.log("in true flag getAllData DB")
+            // console.log("in true flag getAllData DB")
             const response = await client.db(dbName).collection('sample-data').aggregate([
                 {
                     $group: {

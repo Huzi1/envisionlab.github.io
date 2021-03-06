@@ -8,7 +8,7 @@ const DatePicker = (props) => {
 
     const handleChange = (e) => {
         // console.log(e.target.value);
-        console.log("state values", value)
+    
 
         var start = moment.tz(value[0], "Australia/Melbourne").utc().format();
         var end = moment.tz(value[1], "Australia/Melbourne").utc().format();
